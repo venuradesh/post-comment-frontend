@@ -38,15 +38,13 @@ function Post() {
 
   const onUpdateClick = (comment) => {
     const specificComment = allComments.filter((comments) => comments.time === updateTime);
-    console.log("prev:", specificComment);
 
     specificComment.map((prevComment) => {
       prevComment.comment = updatedComment;
       prevComment.time = Date.now();
     });
 
-    console.log(specificComment);
-    setAllComments([...specificComment, ...allComments.filter((comment) => comment.time !== updateTime)]);
+    setAllComments([...allComments.filter((comment) => comment.time !== updateTime)]);
     setUpdateComment(false);
   };
 

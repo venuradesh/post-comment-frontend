@@ -1,3 +1,14 @@
+:root {
+  --background-color: #e2ddd9;
+  --post-background: #f8f1e9;
+  --text-heading-color: #001449;
+  --text-sub-color: #005bc5;
+  --btn-color-alt: #27ae60;
+  --btn-color: #429867;
+  --btn-danger: #e6324b;
+  --btn-danger-alt: #9e0c39;
+}
+
 * {
   padding: 0;
   margin: 0;
@@ -6,4 +17,5 @@
 
 body {
   font-family: sans-serif;
+  background-color: var(--background-color);
 }

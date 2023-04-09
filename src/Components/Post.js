@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import moment from "moment/moment";
+import axios from "axios";
 
 //images
 import PostCover from "../assets/post-cover.jpg";
@@ -11,19 +12,38 @@ import Edit from "../assets/edit.png";
 import Delete from "../assets/delete.png";
 
 function Post() {
-  const localStorage = window.localStorage;
-  const [allComments, setAllComments] = useState(localStorage.getItem("comments") ? [...JSON.parse(localStorage.getItem("comments"))] : []);
+  const [allComments, setAllComments] = useState([]);
   const [addComment, setAddComment] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [updateComment, setUpdateComment] = useState(false);
-  const [updateTime, setUpdateTime] = useState(0);
   const [updateCommentVal, setUpdateCommentVal] = useState("");
   const [updatedComment, setUpdatedComment] = useState("");
+  const [updateId, setUpdateId] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
 
   const onPostClick = () => {
+    const data = {
+      name: "userName",
+      comment: newComment,
+      time: Date.now(),
+      commentId: Date.now(),
+    };
+
     if (newComment) {
-      setAllComments((prev) => [{ name: "Venura Warnasooriya", comment: newComment, time: Date.now() }, ...prev]);
       setAddComment(false);
+
+      axios
+        .post("http://localhost:8080/postComments", data, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   };
 
@@ -33,23 +53,48 @@ function Post() {
   };
 
   const onDeleteClick = (time) => {
-    setAllComments([...allComments.filter((comment) => comment.time !== time)]);
+    axios
+      .delete("http://localhost:8080/deleteComment", {
+        headers: {
+          commentId: deleteId,
+        },
+      })
+      .then((res) => {
+        setAllComments([]);
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
-  const onUpdateClick = (comment) => {
-    const specificComment = allComments.filter((comments) => comments.time === updateTime);
-
-    specificComment.map((prevComment) => {
-      prevComment.comment = updatedComment;
-      prevComment.time = Date.now();
-    });
-
-    setAllComments([...allComments.filter((comment) => comment.time !== updateTime)]);
-    setUpdateComment(false);
+  const onUpdateClick = () => {
+    axios
+      .put("http://localhost:8080/updateComment", {
+        newComment: updatedComment,
+        time: Date.now(),
+        commentId: updateId,
+      })
+      .then((res) => {
+        setUpdateComment(false);
+        setAllComments([]);
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   useEffect(() => {
-    localStorage.setItem("comments", JSON.stringify(allComments));
+    // localStorage.setItem("comments", JSON.stringify(allComments));
+    axios
+      .get("http://localhost:8080/getComments")
+      .then((res) => {
+        setAllComments([...res.data]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, [allComments]);
 
   return (
@@ -98,14 +143,20 @@ function Post() {
                         className="edit"
                         onClick={() => {
                           setUpdateComment(true);
-                          setUpdateTime(comment.time);
                           setUpdateCommentVal(comment.comment);
+                          setUpdateId(comment.commentId);
                         }}
                       >
                         <img src={Edit} alt="edit-btn" />
                         Edit
                       </div>
-                      <div className="delete" onClick={() => onDeleteClick(comment.time)}>
+                      <div
+                        className="delete"
+                        onClick={() => {
+                          onDeleteClick(comment.time);
+                          setDeleteId(comment.commentId);
+                        }}
+                      >
                         <img src={Delete} alt="delete-btn" />
                         Delete
                       </div>

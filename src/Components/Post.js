@@ -367,7 +367,6 @@ const ShowComments = styled.div`
     margin-bottom: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid #cbdad5;
-    border-opacity: 0.8;
     position: relative;
     overflow: hidden;
 
